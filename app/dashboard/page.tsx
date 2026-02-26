@@ -2,7 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Application, getApplications, seedIfEmpty } from "../lib/storage";
+import {
+  Application,
+  getApplications,
+  seedIfEmpty,
+  saveApplications,
+} from "../lib/storage";
 
 export default function Dashboard() {
   const [applications, setApplications] = useState<Application[]>([]);
@@ -12,8 +17,21 @@ export default function Dashboard() {
     setApplications(getApplications());
   }, []);
 
+function handleDelete(id: string) {
+  const app = applications.find((a) => a.id === id);
+  const ok = window.confirm(
+    `Delete "${app?.company ?? "this"} - ${app?.role ?? "application"}"? This can't be undone.`
+  );
+  if (!ok) return;
+
+  const updated = applications.filter((a) => a.id !== id);
+  setApplications(updated);
+  saveApplications(updated);
+}
+
   return (
     <main className="min-h-screen p-10 bg-gray-200">
+      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
 
@@ -31,6 +49,7 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {/* Table */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <table className="w-full text-left text-gray-800">
           <thead>
@@ -38,11 +57,15 @@ export default function Dashboard() {
               <th className="py-3 font-semibold">Company</th>
               <th className="py-3 font-semibold">Role</th>
               <th className="py-3 font-semibold">Status</th>
+              <th className="py-3 font-semibold">Actions</th>
             </tr>
           </thead>
           <tbody>
             {applications.map((app) => (
-              <tr key={app.id} className="border-b border-gray-200 hover:bg-gray-100">
+              <tr
+                key={app.id}
+                className="border-b border-gray-200 hover:bg-gray-100"
+              >
                 <td className="py-3">{app.company}</td>
                 <td className="py-3">{app.role}</td>
                 <td className="py-3">
@@ -60,12 +83,20 @@ export default function Dashboard() {
                     {app.status}
                   </span>
                 </td>
+                <td className="py-3">
+                  <button
+                    onClick={() => handleDelete(app.id)}
+                    className="text-red-600 hover:underline"
+                  >
+                    Delete
+                  </button>
+                </td>
               </tr>
             ))}
 
             {applications.length === 0 && (
               <tr>
-                <td className="py-6 text-gray-500" colSpan={3}>
+                <td className="py-6 text-gray-500" colSpan={4}>
                   No applications yet.
                 </td>
               </tr>
