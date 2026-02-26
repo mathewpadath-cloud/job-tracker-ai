@@ -29,6 +29,30 @@ export default function Dashboard() {
     saveApplications(updated);
   }
 
+  const [statusFilter, setStatusFilter] = useState<
+  "All" | Application["status"]
+>("All");
+
+const filteredApplications =
+  statusFilter === "All"
+    ? applications
+    : applications.filter((a) => a.status === statusFilter);
+
+const counts = applications.reduce(
+  (acc, a) => {
+    acc.total += 1;
+    acc[a.status] += 1;
+    return acc;
+  },
+  { total: 0, Applied: 0, Interview: 0, Offer: 0, Rejected: 0 } as {
+    total: number;
+    Applied: number;
+    Interview: number;
+    Offer: number;
+    Rejected: number;
+  }
+);
+
   return (
     <main className="min-h-screen p-10 bg-gray-200">
       <div className="flex items-center justify-between mb-8">
@@ -48,6 +72,47 @@ export default function Dashboard() {
         </div>
       </div>
 
+        {/* Stats */}
+<div className="grid grid-cols-2 sm:grid-cols-5 gap-4 mb-6">
+  <div className="bg-white rounded-xl shadow p-4">
+    <div className="text-sm text-gray-500">Total</div>
+    <div className="text-2xl font-bold text-gray-900">{counts.total}</div>
+  </div>
+  <div className="bg-white rounded-xl shadow p-4">
+    <div className="text-sm text-gray-500">Applied</div>
+    <div className="text-2xl font-bold text-gray-900">{counts.Applied}</div>
+  </div>
+  <div className="bg-white rounded-xl shadow p-4">
+    <div className="text-sm text-gray-500">Interview</div>
+    <div className="text-2xl font-bold text-gray-900">{counts.Interview}</div>
+  </div>
+  <div className="bg-white rounded-xl shadow p-4">
+    <div className="text-sm text-gray-500">Offer</div>
+    <div className="text-2xl font-bold text-gray-900">{counts.Offer}</div>
+  </div>
+  <div className="bg-white rounded-xl shadow p-4">
+    <div className="text-sm text-gray-500">Rejected</div>
+    <div className="text-2xl font-bold text-gray-900">{counts.Rejected}</div>
+  </div>
+</div>
+
+{/* Filter */}
+<div className="mb-4 flex items-center gap-3">
+  <span className="text-sm font-semibold text-gray-800">Filter:</span>
+  <select
+    className="rounded-lg border border-gray-300 p-2 text-gray-900"
+    value={statusFilter}
+    onChange={(e) =>
+      setStatusFilter(e.target.value as "All" | Application["status"])
+    }
+  >
+    <option value="All">All</option>
+    <option value="Applied">Applied</option>
+    <option value="Interview">Interview</option>
+    <option value="Offer">Offer</option>
+    <option value="Rejected">Rejected</option>
+  </select>
+</div>
       <div className="bg-white rounded-xl shadow-lg p-6">
         <table className="w-full text-left text-gray-800">
           <thead>
@@ -60,7 +125,7 @@ export default function Dashboard() {
           </thead>
 
           <tbody>
-            {applications.map((app) => (
+            {filteredApplications.map((app) => (
               <tr
                 key={app.id}
                 className="border-b border-gray-200 hover:bg-gray-100"
@@ -101,7 +166,7 @@ export default function Dashboard() {
               </tr>
             ))}
 
-            {applications.length === 0 && (
+            {filteredApplications.length === 0 && (
               <tr>
                 <td className="py-6 text-gray-500" colSpan={4}>
                   No applications yet.
