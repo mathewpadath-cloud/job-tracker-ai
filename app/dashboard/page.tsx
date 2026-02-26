@@ -17,21 +17,20 @@ export default function Dashboard() {
     setApplications(getApplications());
   }, []);
 
-function handleDelete(id: string) {
-  const app = applications.find((a) => a.id === id);
-  const ok = window.confirm(
-    `Delete "${app?.company ?? "this"} - ${app?.role ?? "application"}"? This can't be undone.`
-  );
-  if (!ok) return;
+  function handleDelete(id: string) {
+    const app = applications.find((a) => a.id === id);
+    const ok = window.confirm(
+      `Delete "${app?.company ?? "this"} - ${app?.role ?? "application"}"? This can't be undone.`
+    );
+    if (!ok) return;
 
-  const updated = applications.filter((a) => a.id !== id);
-  setApplications(updated);
-  saveApplications(updated);
-}
+    const updated = applications.filter((a) => a.id !== id);
+    setApplications(updated);
+    saveApplications(updated);
+  }
 
   return (
     <main className="min-h-screen p-10 bg-gray-200">
-      {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Dashboard</h1>
 
@@ -49,7 +48,6 @@ function handleDelete(id: string) {
         </div>
       </div>
 
-      {/* Table */}
       <div className="bg-white rounded-xl shadow-lg p-6">
         <table className="w-full text-left text-gray-800">
           <thead>
@@ -60,6 +58,7 @@ function handleDelete(id: string) {
               <th className="py-3 font-semibold">Actions</th>
             </tr>
           </thead>
+
           <tbody>
             {applications.map((app) => (
               <tr
@@ -83,7 +82,15 @@ function handleDelete(id: string) {
                     {app.status}
                   </span>
                 </td>
-                <td className="py-3">
+
+                <td className="py-3 space-x-4">
+                  <Link
+                    href={`/edit/${app.id}`}
+                    className="text-blue-600 hover:underline"
+                  >
+                    Edit
+                  </Link>
+
                   <button
                     onClick={() => handleDelete(app.id)}
                     className="text-red-600 hover:underline"
